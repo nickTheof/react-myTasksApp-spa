@@ -19,14 +19,17 @@ export type Action =
 
 export type TaskFormProps = {
     dispatch: Dispatch<Action>;
+    ref: React.RefObject<HTMLInputElement | null>
 }
 
 export type TasksListProps = {
-    tasks: TaskProps[],
-    dispatch: Dispatch<Action>
+    tasks: TaskProps[];
+    dispatch: Dispatch<Action>;
+    ref: React.RefObject<HTMLInputElement | null>
 }
 
 export type TaskListItemProps = {
-    task: TaskProps,
-    dispatch: Dispatch<Action>
+    task: TaskProps;
+    dispatch: Dispatch<Action>;
+    ref: React.RefObject<HTMLInputElement | null>
 }

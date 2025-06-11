@@ -1,4 +1,4 @@
-import {useEffect, useReducer} from "react";
+import {useEffect, useReducer, useRef} from "react";
 import type {Action, TaskProps} from "../types.ts";
 import TaskForm from "./TaskForm";
 import TasksList from "./TasksList.tsx";
@@ -40,23 +40,33 @@ const tasksReducer = (state: TaskProps[], action: Action): TaskProps[] => {
 
 const Tasks = () => {
     const [tasks, dispatch] = useReducer(tasksReducer, [], getInitialTasks);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const handleClearAll = () => {
+        dispatch({ type: "CLEAR_ALL"});
+        inputRef.current?.focus();
+    }
 
     useEffect(() => {
         localStorage.setItem("tasks", JSON.stringify(tasks));
     }, [tasks]);
 
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
+
     return (
         <>
             <div className = "max-w-sm mx-auto mt-12 flex flex-col">
                 <h1 className="text-center text-2xl mb-4">Tasks List</h1>
-                <TaskForm dispatch={dispatch} />
-                <TasksList tasks={tasks} dispatch={dispatch} />
+                <TaskForm dispatch={dispatch} ref={inputRef} />
+                <TasksList tasks={tasks} dispatch={dispatch} ref={inputRef} />
             { tasks.length > 0 && (
                 <>
                     <TasksStats tasks={tasks} />
                     <div className="text-end m-4">
                         <button
-                            onClick={() => dispatch({ type: "CLEAR_ALL"})}
+                            onClick={handleClearAll}
                             className="bg-cf-red-100 text-white py-2 px-4 rounded"
                         >
                             Clear All

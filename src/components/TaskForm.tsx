@@ -1,7 +1,7 @@
 import {type FormEvent, useState} from "react";
 import type {TaskFormProps} from "../types.ts";
 
-const TaskForm = ({dispatch}: TaskFormProps) => {
+const TaskForm = ({dispatch, ref}: TaskFormProps) => {
     const [text, setText] = useState("");
 
     const handleSubmit = (e: FormEvent) => {
@@ -9,6 +9,7 @@ const TaskForm = ({dispatch}: TaskFormProps) => {
         if (text === "") return;
         dispatch({type: "ADD", payload: text});
         setText("");
+        ref.current?.focus();
     }
 
     return (
@@ -16,6 +17,7 @@ const TaskForm = ({dispatch}: TaskFormProps) => {
             <form onSubmit={handleSubmit} className="flex gap-4 mb-4">
                 <input
                     type="text"
+                    ref={ref}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     className="flex-1 border p-2 rounded"

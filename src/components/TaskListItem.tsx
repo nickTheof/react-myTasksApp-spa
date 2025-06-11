@@ -1,14 +1,16 @@
 import type {TaskListItemProps} from "../types.ts";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {CheckSquare, Edit, Save, Square, Trash, X} from "lucide-react";
 
-const TaskListItem = ({task, dispatch}: TaskListItemProps) => {
+const TaskListItem = ({task, dispatch, ref}: TaskListItemProps) => {
     const [isEdit, setIsEdit] = useState(false);
     const [text, setText] = useState(task.text);
+    const editRef = useRef<HTMLInputElement>(null);
 
     const handleCancelEdit = () => {
         setText(task.text);
         setIsEdit(false);
+        ref.current?.focus();
     }
 
     const handleSubmitEdit = () => {
@@ -20,19 +22,40 @@ const TaskListItem = ({task, dispatch}: TaskListItemProps) => {
             }
         })
         setIsEdit(false);
+        ref.current?.focus();
     }
 
     const handleDelete = () => {
         dispatch({
             type: "DELETE", payload: task.id
         })
+        ref.current?.focus();
     }
 
     const handleCompleteTask = () => {
         dispatch({
             type: "COMPLETE", payload: task.id
         })
+        ref.current?.focus();
     }
+
+    const handleStartEditing = () => {
+        setIsEdit(true);
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            handleSubmitEdit();
+        } else if (e.key === "Escape") {
+            handleCancelEdit();
+        }
+    }
+
+    useEffect(() => {
+        if (isEdit) {
+            editRef.current?.focus();
+        }
+    }, [isEdit]);
 
     return (
         <>
@@ -44,8 +67,10 @@ const TaskListItem = ({task, dispatch}: TaskListItemProps) => {
                     <input
                         className="flex-1 p-2 border rounded-md"
                         type="text"
+                        ref={editRef}
                         value={text}
                         onChange={(e) => setText(e.target.value)}
+                        onKeyDown={handleKeyDown}
                     />
                         <div className="flex gap-x-2">
                             <button onClick={handleSubmitEdit}>
@@ -67,7 +92,7 @@ const TaskListItem = ({task, dispatch}: TaskListItemProps) => {
                             <span className={`${task.completed ? "line-through" : ""} block max-w-[300px] overflow-hidden text-ellipsis whitespace-nowrap`}>{task.text}</span>
                         </div>
                         <div className="flex gap-x-2">
-                            <button onClick={() => setIsEdit(true)}><Edit size={16} /></button>
+                            <button onClick={handleStartEditing}><Edit size={16} /></button>
                             <button onClick={handleDelete}><Trash className="text-red-500" size={16}/></button>
                         </div>
                     </>
